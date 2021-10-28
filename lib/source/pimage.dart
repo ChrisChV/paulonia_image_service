@@ -70,8 +70,12 @@ class PImage extends StatelessWidget {
     }
 
     if (radius != null) {
-      return ClipOval(
-        child: _imageWidget,
+      return SizedBox(
+        width: width,
+        height: height,
+        child: ClipOval(
+          child: _imageWidget,
+        ),
       );
     }
 
