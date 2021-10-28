@@ -1,24 +1,35 @@
+import 'dart:collection';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:paulonia_cache_image/paulonia_cache_image.dart';
+import 'package:paulonia_image_service/source/contants.dart';
 import 'package:paulonia_image_service/source/globals.dart';
 
 /// Image provider service for [PImage]
 class PImageService {
   static bool isLoaded(String gsUrl) {
-    ImageProvider? imageProvider = _imageProviders[gsUrl];
-    return imageProvider != null;
+    PImageInfo? imageInfo;
+    if (imageInfo == null) return false;
+    return imageInfo.isLoaded;
   }
 
   /// Sets the configuration for the PImageService
-  static void settings({int? maxCacheSize, int? maxImages}) {
+  static void settings({
+    int? maxCacheSize,
+    int? maxImages,
+    ImageProvider? defaultPlaceholder,
+  }) {
     if (maxImages != null) {
       PImageGlobals.pImageInMemoryImages = maxImages;
     }
 
     if (maxCacheSize != null) {
       PImageGlobals.pImageInMemorySize = maxCacheSize;
+    }
+
+    if (defaultPlaceholder != null) {
+      _defaultPlaceholder = defaultPlaceholder;
     }
   }
 
@@ -33,16 +44,28 @@ class PImageService {
   static ImageProvider getImage(String gsUrl, {String? id}) {
     id ??= gsUrl;
 
-    ImageProvider? imageProvider = _imageProviders[id];
+    PImageInfo? imageInfo = _imageProviders[id];
+    imageInfo ??= _addImageProvider(gsUrl, id);
 
-    imageProvider ??= _addImageProvider(gsUrl, id);
+    return imageInfo.image;
+  }
+
+  static ImageProvider getPlaceholder(String? assetName) {
+    if (assetName == null) {
+      return _defaultPlaceholder;
+    }
+
+    ImageProvider? imageProvider = _placeholders[assetName];
+    imageProvider ??= _addPlaceholder(assetName);
 
     return imageProvider;
   }
 
   /// Manually updates the image provider of [id]
   static void updateImage(String id, ImageProvider image) {
-    _imageProviders[id] = image;
+    PImageInfo? info = _imageProviders[id];
+    if (info == null) return;
+    info.image = image;
   }
 
   /// Preloads the [gsUrls] images and stores them
@@ -63,18 +86,31 @@ class PImageService {
     }
   }
 
-  static ImageProvider _addImageProvider(String url, String id) {
+  static PImageInfo _addImageProvider(String url, String id) {
     if (_imagesExceeded() || _imagesSizeExceeded()) {
       _clearImages();
-      _imageProviders = {};
     }
-    ImageProvider imageProvider = PCacheImage(url);
-    _imageProviders[id] = imageProvider;
-    return imageProvider;
+    PImageInfo imageInfo = PImageInfo(image: PCacheImage(url));
+    _imageProviders[id] = imageInfo;
+
+    imageInfo.image.resolve(const ImageConfiguration()).addListener(
+      ImageStreamListener(
+        (info, call) {
+          imageInfo.isLoaded = true;
+        },
+      ),
+    );
+    return imageInfo;
+  }
+
+  static ImageProvider _addPlaceholder(String assetName) {
+    ImageProvider image = AssetImage(assetName);
+    _placeholders[assetName] = image;
+    return image;
   }
 
   static void _clearImages() {
-    _imageProviders = {};
+    _imageProviders = HashMap<String, PImageInfo>();
     PaintingBinding.instance!.imageCache!.clear();
     PaintingBinding.instance!.imageCache!.clearLiveImages();
     log("[Paulonia Image Service] ------------------------ image providers freed");
@@ -100,5 +136,16 @@ class PImageService {
     return exceeded;
   }
 
-  static Map<String, ImageProvider> _imageProviders = {};
+  static ImageProvider _defaultPlaceholder =
+      AssetImage(PImageConstants.defaultPlaceholder);
+  static HashMap<String, PImageInfo> _imageProviders =
+      HashMap<String, PImageInfo>();
+  static final  HashMap<String, ImageProvider> _placeholders =
+      HashMap<String, ImageProvider>();
+}
+
+class PImageInfo {
+  PImageInfo({required this.image, this.isLoaded = false});
+  ImageProvider image;
+  bool isLoaded;
 }

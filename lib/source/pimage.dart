@@ -60,7 +60,7 @@ class PImage extends StatelessWidget {
       );
     } else {
       _imageWidget = FadeInImage(
-        placeholder: AssetImage(assetName),
+        placeholder: PImageService.getPlaceholder(assetName),
         image: PImageService.getImage(
           gsUrl,
           id: id,
