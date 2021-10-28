@@ -11,6 +11,7 @@ class PImage extends StatelessWidget {
     Key? key,
     required this.gsUrl,
     required this.assetName,
+    this.id,
     this.width = double.infinity,
     this.height = double.infinity,
     this.fit = BoxFit.cover,
@@ -21,6 +22,7 @@ class PImage extends StatelessWidget {
     Key? key,
     required this.gsUrl,
     required this.assetName,
+    this.id,
     this.radius = 20,
     this.fit = BoxFit.cover,
   }) : super(key: key) {
@@ -33,6 +35,7 @@ class PImage extends StatelessWidget {
 
   /// asset path for the placeholder
   final String assetName;
+  final String? id;
   final BoxFit fit;
   double? width;
   double? height;
@@ -49,13 +52,19 @@ class PImage extends StatelessWidget {
     Widget _imageWidget;
     if (PImageService.isLoaded(gsUrl)) {
       _imageWidget = Image(
-        image: PImageService.getImage(gsUrl),
+        image: PImageService.getImage(
+          gsUrl,
+          id: id,
+        ),
         fit: fit,
       );
     } else {
       _imageWidget = FadeInImage(
         placeholder: AssetImage(assetName),
-        image: PImageService.getImage(gsUrl),
+        image: PImageService.getImage(
+          gsUrl,
+          id: id,
+        ),
         fit: fit,
       );
     }
