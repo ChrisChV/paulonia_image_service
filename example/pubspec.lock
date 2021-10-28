@@ -50,6 +50,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  cupertino_icons:
+    dependency: "direct main"
+    description:
+      name: cupertino_icons
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -234,12 +241,19 @@ packages:
     source: hosted
     version: "2.0.3"
   paulonia_cache_image:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: paulonia_cache_image
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.1"
+  paulonia_image_service:
+    dependency: "direct main"
+    description:
+      path: "/home/texs/Documents/Paulonia/paulonia_image_service/"
+      relative: false
+    source: path
+    version: "0.0.1"
   platform:
     dependency: transitive
     description:
