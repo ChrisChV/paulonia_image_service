@@ -10,8 +10,8 @@ class PImage extends StatelessWidget {
   PImage({
     Key? key,
     required this.gsUrl,
-    required this.assetName,
     this.id,
+    this.assetName,
     this.width = double.infinity,
     this.height = double.infinity,
     this.fit = BoxFit.cover,
@@ -21,7 +21,7 @@ class PImage extends StatelessWidget {
   PImage.avatar({
     Key? key,
     required this.gsUrl,
-    required this.assetName,
+    this.assetName,
     this.id,
     this.radius = 20,
     this.fit = BoxFit.cover,
@@ -34,7 +34,7 @@ class PImage extends StatelessWidget {
   ImageProvider? imageProvider;
 
   /// asset path for the placeholder
-  final String assetName;
+  final String? assetName;
   final String? id;
   final BoxFit fit;
   double? width;
