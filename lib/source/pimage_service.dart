@@ -137,7 +137,7 @@ class PImageService {
   }
 
   static ImageProvider _defaultPlaceholder =
-      AssetImage(PImageConstants.defaultPlaceholder);
+      AssetImage(PImageConstants.defaultPlaceholder, package: 'paulonia_image_service');
   static HashMap<String, PImageInfo> _imageProviders =
       HashMap<String, PImageInfo>();
   static final  HashMap<String, ImageProvider> _placeholders =
