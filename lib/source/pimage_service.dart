@@ -2,11 +2,24 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:paulonia_cache_image/paulonia_cache_image.dart';
+import 'package:paulonia_image_service/source/globals.dart';
 
+/// Image provider service for [PImage]
 class PImageService {
   static bool isLoaded(String gsUrl) {
     ImageProvider? imageProvider = _imageProviders[gsUrl];
     return imageProvider != null;
+  }
+
+  /// Sets the configuration for the PImageService
+  static void settings({int? maxCacheSize, int? maxImages}) {
+    if (maxImages != null) {
+      PImageGlobals.pImageInMemoryImages = maxImages;
+    }
+
+    if (maxCacheSize != null) {
+      PImageGlobals.pImageInMemorySize = maxCacheSize;
+    }
   }
 
   /// Gets the [ImageProvider] of the provided gsUrl
@@ -16,14 +29,18 @@ class PImageService {
   /// returns the already cached [ImageProvider].
   /// The store [ImageProvider] may be removed once a
   /// limit is reached.
-  static ImageProvider getImage(String gsUrl) {
+  static ImageProvider getImage(String gsUrl, {String? id}) {
     ImageProvider? imageProvider = _imageProviders[gsUrl];
 
-    if (imageProvider == null) {
-      imageProvider = _addImageProvider(gsUrl);
-    }
+    id ??= gsUrl;
+
+    imageProvider ??= _addImageProvider(gsUrl, id);
 
     return imageProvider;
+  }
+
+  static void updateImage(String id, ImageProvider image) {
+    _imageProviders[id] = image;
   }
 
   static void preloadImages(
@@ -32,7 +49,7 @@ class PImageService {
     Function? onFinish,
   }) {
     int counter = 0;
-    gsUrls.forEach((gsUrl) {
+    for (var gsUrl in gsUrls) {
       precacheImage(PCacheImage(gsUrl), context).then((value) {
         getImage(gsUrl);
         counter++;
@@ -40,16 +57,16 @@ class PImageService {
           onFinish();
         }
       });
-    });
+    }
   }
 
-  static ImageProvider _addImageProvider(String gsUrl) {
-    if (_imageProviders.length >= _maxCachedProviders) {
+  static ImageProvider _addImageProvider(String url, String id) {
+    if (_imagesExceeded() || _imagesSizeExceeded()) {
       _clearImages();
       _imageProviders = {};
     }
-    ImageProvider imageProvider = PCacheImage(gsUrl);
-    _imageProviders[gsUrl] = imageProvider;
+    ImageProvider imageProvider = PCacheImage(url);
+    _imageProviders[id] = imageProvider;
     return imageProvider;
   }
 
@@ -57,12 +74,17 @@ class PImageService {
     _imageProviders = {};
     PaintingBinding.instance!.imageCache!.clear();
     PaintingBinding.instance!.imageCache!.clearLiveImages();
-    log("[FeedUiController] Images cleared");
+    log("[Paulonia Image Service] ------------ Images cleared");
+  }
+
+  static bool _imagesExceeded() {
+    return _imageProviders.length >= PImageGlobals.pImageInMemoryImages;
+  }
+
+  static bool _imagesSizeExceeded() {
+    return PaintingBinding.instance!.imageCache!.currentSizeBytes >=
+        PImageGlobals.pImageInMemorySize;
   }
 
   static Map<String, ImageProvider> _imageProviders = {};
-  static int _maxCachedProviders = 50;
-
-  // TODO remove image providers in order of usage
-  // List<String> _gsUrlsOrder = [];
 }
