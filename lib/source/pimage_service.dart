@@ -74,16 +74,27 @@ class PImageService {
     _imageProviders = {};
     PaintingBinding.instance!.imageCache!.clear();
     PaintingBinding.instance!.imageCache!.clearLiveImages();
-    log("[Paulonia Image Service] ------------ Images cleared");
+    log("[Paulonia Image Service] ------------------------ image providers freed");
+    log("[Paulonia Image Service] ------------------------ cache cleared");
   }
 
   static bool _imagesExceeded() {
-    return _imageProviders.length >= PImageGlobals.pImageInMemoryImages;
+    final bool exceeded =
+        _imageProviders.length >= PImageGlobals.pImageInMemoryImages;
+    if (exceeded) {
+      log("[Paulonia Image Service] ------------------------ images exceeded");
+    }
+    return exceeded;
   }
 
   static bool _imagesSizeExceeded() {
-    return PaintingBinding.instance!.imageCache!.currentSizeBytes >=
-        PImageGlobals.pImageInMemorySize;
+    final bool exceeded =
+        PaintingBinding.instance!.imageCache!.currentSizeBytes >=
+            PImageGlobals.pImageInMemorySize;
+    if (exceeded) {
+      log("[Paulonia Image Service] ------------------------ size exceeded");
+    }
+    return exceeded;
   }
 
   static Map<String, ImageProvider> _imageProviders = {};
