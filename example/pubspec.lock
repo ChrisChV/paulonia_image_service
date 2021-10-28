@@ -250,8 +250,8 @@ packages:
   paulonia_image_service:
     dependency: "direct main"
     description:
-      path: "/home/texs/Documents/Paulonia/paulonia_image_service/"
-      relative: false
+      path: ".."
+      relative: true
     source: path
     version: "0.0.1"
   platform:

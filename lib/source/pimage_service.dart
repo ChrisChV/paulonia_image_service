@@ -24,25 +24,28 @@ class PImageService {
 
   /// Gets the [ImageProvider] of the provided gsUrl
   ///
-  /// If it's the first call using the [gsUrl], then it
+  /// If [id] is null then used the [gsUrl] as id.
+  /// If it's the first call using the id, then it
   /// creates a [PCacheImage] and stores it. Otherwise
   /// returns the already cached [ImageProvider].
   /// The store [ImageProvider] may be removed once a
   /// limit is reached.
   static ImageProvider getImage(String gsUrl, {String? id}) {
-    ImageProvider? imageProvider = _imageProviders[gsUrl];
-
     id ??= gsUrl;
+
+    ImageProvider? imageProvider = _imageProviders[id];
 
     imageProvider ??= _addImageProvider(gsUrl, id);
 
     return imageProvider;
   }
 
+  /// Manually updates the image provider of [id]
   static void updateImage(String id, ImageProvider image) {
     _imageProviders[id] = image;
   }
 
+  /// Preloads the [gsUrls] images and stores them
   static void preloadImages(
     List<String> gsUrls,
     BuildContext context, {
