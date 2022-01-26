@@ -1,6 +1,6 @@
 name: paulonia_image_service
 description: A new Flutter package project.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/texsmv/paulonia_image_service
 
 environment:
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  paulonia_cache_image: ^0.4.1
+  paulonia_cache_image: ^0.5.0
 
 dev_dependencies:
   flutter_test:
