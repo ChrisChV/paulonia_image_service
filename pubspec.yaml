@@ -10,7 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  paulonia_cache_image: 1.0.0
+  paulonia_cache_image:
+    git:
+      url: https://github.com/PauloniaAQP/paulonia_cache_image
+      ref: storage-update
+
 
 dev_dependencies:
   flutter_test:
